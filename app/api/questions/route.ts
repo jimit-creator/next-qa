@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       .toArray();
 
     // Get category names
-    const categoryIds = [...new Set(result.map(q => q.categoryId))];
+    const categoryIds = Array.from(new Set(result.map(q => q.categoryId)));
     const categoryMap = new Map();
     
     if (categoryIds.length > 0) {
