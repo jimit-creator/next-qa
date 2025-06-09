@@ -2,19 +2,53 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiUsers, FiMessageSquare, FiFolder, FiTrendingUp } from 'react-icons/fi';
 import Card from '@/components/ui/Card';
+import useSWR from 'swr';
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [stats, setStats] = useState({
-    totalQuestions: 0,
-    totalCategories: 0,
-    recentQuestions: 0,
-  });
+
+  // Define a fetcher function for SWR
+  const fetcher = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const error = new Error('An error occurred while fetching data.');
+      // @ts-ignore
+      error.info = await res.json();
+      // @ts-ignore
+      error.status = res.status;
+      throw error;
+    }
+    return res.json();
+  };
+
+  // Use SWR for questions and categories to get stats
+  const { data: questionsData, error: questionsError } = useSWR<{ questions: any[]; total: number }>('/api/questions?limit=1000', fetcher);
+  const { data: categoriesData, error: categoriesError } = useSWR<any[]>('/api/categories', fetcher);
+
+  const isLoading = (!questionsData && !questionsError) || (!categoriesData && !categoriesError);
+  const isError = questionsError || categoriesError;
+
+  let totalQuestions = 0;
+  let totalCategories = 0;
+  let recentQuestions = 0;
+
+  if (questionsData) {
+    totalQuestions = questionsData.total || questionsData.questions?.length || 0;
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    recentQuestions = questionsData.questions?.filter((q: any) => 
+      new Date(q.createdAt) > weekAgo
+    ).length || 0;
+  }
+
+  if (categoriesData) {
+    totalCategories = categoriesData.length || 0;
+  }
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -23,40 +57,20 @@ export default function AdminDashboard() {
       router.push('/admin/login');
       return;
     }
-
-    fetchStats();
   }, [session, status, router]);
 
-  const fetchStats = async () => {
-    try {
-      const [questionsRes, categoriesRes] = await Promise.all([
-        fetch('/api/questions?limit=1000'),
-        fetch('/api/categories'),
-      ]);
-
-      const questionsData = await questionsRes.json();
-      const categoriesData = await categoriesRes.json();
-
-      const now = new Date();
-      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const recentQuestions = questionsData.questions?.filter((q: any) => 
-        new Date(q.createdAt) > weekAgo
-      ).length || 0;
-
-      setStats({
-        totalQuestions: questionsData.total || questionsData.questions?.length || 0,
-        totalCategories: categoriesData.length || 0,
-        recentQuestions,
-      });
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
-    }
-  };
-
-  if (status === 'loading') {
+  if (status === 'loading' || isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-red-600">Failed to load dashboard data.</p>
       </div>
     );
   }
@@ -68,21 +82,21 @@ export default function AdminDashboard() {
   const statCards = [
     {
       title: 'Total Questions',
-      value: stats.totalQuestions,
+      value: totalQuestions,
       icon: FiMessageSquare,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
     },
     {
       title: 'Categories',
-      value: stats.totalCategories,
+      value: totalCategories,
       icon: FiFolder,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
       title: 'Recent Questions',
-      value: stats.recentQuestions,
+      value: recentQuestions,
       icon: FiTrendingUp,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',

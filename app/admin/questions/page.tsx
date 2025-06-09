@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter, FiArrowLeft } from 'react-icons/fi';
 import Card from '@/components/ui/Card';
@@ -12,17 +12,14 @@ import Modal from '@/components/ui/Modal';
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Question, Category } from '@/types';
 import Link from 'next/link';
+import useSWR from 'swr';
 
 export default function QuestionsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [formData, setFormData] = useState({
@@ -34,6 +31,39 @@ export default function QuestionsPage() {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  // Define a fetcher function for SWR
+  const fetcher = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const error = new Error('An error occurred while fetching data.');
+      // Attach extra info to the error object.
+      // @ts-ignore
+      error.info = await res.json();
+      // @ts-ignore
+      error.status = res.status;
+      throw error;
+    }
+    return res.json();
+  };
+
+  // Use SWR for categories
+  const { data: categoriesData, error: categoriesError } = useSWR<Category[]>('/api/categories', fetcher);
+  const categories = categoriesData || [];
+  const categoriesLoading = !categoriesData && !categoriesError;
+
+  // Use SWR for questions
+  const questionsUrl = `/api/questions?page=${currentPage}&limit=10&search=${searchTerm}&categoryId=${selectedCategory}`;
+  const { data: questionsData, error: questionsError, mutate } = useSWR<{
+    questions: Question[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }>(questionsUrl, fetcher);
+
+  const questions = questionsData?.questions || [];
+  const totalPages = questionsData?.totalPages || 1;
+  const questionsLoading = !questionsData && !questionsError;
+
   useEffect(() => {
     if (status === 'loading') return;
     
@@ -41,47 +71,7 @@ export default function QuestionsPage() {
       router.push('/admin/login');
       return;
     }
-
-    fetchCategories();
-    fetchQuestions();
   }, [session, status, router]);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [searchTerm, selectedCategory, currentPage]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/categories');
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-    }
-  };
-
-  const fetchQuestions = async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: '10',
-      });
-      
-      if (searchTerm) params.append('search', searchTerm);
-      if (selectedCategory) params.append('categoryId', selectedCategory);
-
-      const response = await fetch(`/api/questions?${params}`);
-      const data = await response.json();
-      
-      setQuestions(data.questions || []);
-      setTotalPages(data.totalPages || 1);
-    } catch (error) {
-      console.error('Failed to fetch questions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +92,7 @@ export default function QuestionsPage() {
       });
 
       if (response.ok) {
-        await fetchQuestions();
+        mutate(); // Revalidate questions data after successful submission
         setIsModalOpen(false);
         setEditingQuestion(null);
         setFormData({
@@ -144,7 +134,7 @@ export default function QuestionsPage() {
       });
 
       if (response.ok) {
-        await fetchQuestions();
+        mutate(); // Revalidate questions data after successful deletion
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to delete question');
@@ -170,10 +160,18 @@ export default function QuestionsPage() {
     return tmp.textContent || tmp.innerText || '';
   };
 
-  if (status === 'loading' || loading) {
+  if (status === 'loading' || categoriesLoading || questionsLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (categoriesError || questionsError) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-red-600">Failed to load data.</p>
       </div>
     );
   }
@@ -220,7 +218,7 @@ export default function QuestionsPage() {
                   type="text"
                   placeholder="Search questions..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => { setCurrentPage(1); setSearchTerm(e.target.value); }}
                   className="pl-9 text-sm"
                 />
               </div>
@@ -230,7 +228,7 @@ export default function QuestionsPage() {
                 <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <select
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={(e) => { setCurrentPage(1); setSelectedCategory(e.target.value); }}
                   className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All Categories</option>
@@ -246,7 +244,7 @@ export default function QuestionsPage() {
         </motion.div>
 
         {/* Questions List */}
-        {loading ? (
+        {questionsLoading ? (
           <div className="flex justify-center items-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>

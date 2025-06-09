@@ -7,59 +7,50 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Question, Category } from '@/types';
+import useSWR from 'swr';
 
 export default function Home() {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+
+  // Define a fetcher function for SWR
+  const fetcher = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const error = new Error('An error occurred while fetching data.');
+      // Attach extra info to the error object.
+      // @ts-ignore
+      error.info = await res.json();
+      // @ts-ignore
+      error.status = res.status;
+      throw error;
+    }
+    return res.json();
+  };
+
+  // Use SWR for categories
+  const { data: categoriesData, error: categoriesError } = useSWR<Category[]>('/api/categories', fetcher);
+  const categories = categoriesData || [];
+  const categoriesLoading = !categoriesData && !categoriesError;
+
+  // Use SWR for questions
+  const questionsUrl = `/api/questions?page=${currentPage}&limit=10&search=${searchTerm}&categoryId=${selectedCategory}`;
+  const { data: questionsData, error: questionsError, mutate } = useSWR<{
+    questions: Question[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }>(questionsUrl, fetcher);
+
+  const questions = questionsData?.questions || [];
+  const totalPages = questionsData?.totalPages || 1;
+  const questionsLoading = !questionsData && !questionsError;
 
   useEffect(() => {
-    fetchCategories();
-    fetchQuestions();
     fetchBookmarks();
   }, []);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [searchTerm, selectedCategory, currentPage]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/categories');
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-    }
-  };
-
-  const fetchQuestions = async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: '10',
-      });
-      
-      if (searchTerm) params.append('search', searchTerm);
-      if (selectedCategory) params.append('categoryId', selectedCategory);
-
-      const response = await fetch(`/api/questions?${params}`);
-      const data = await response.json();
-      
-      setQuestions(data.questions || []);
-      setTotalPages(data.totalPages || 1);
-    } catch (error) {
-      console.error('Failed to fetch questions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchBookmarks = async () => {
     try {
@@ -108,6 +99,22 @@ export default function Home() {
     return { __html: html };
   };
 
+  if (categoriesLoading || questionsLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (categoriesError || questionsError) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-red-600">Failed to load data.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -126,7 +133,7 @@ export default function Home() {
                   type="text"
                   placeholder="Search questions, answers, or tags..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => { setCurrentPage(1); setSearchTerm(e.target.value); }}
                   className="pl-9 text-sm"
                 />
               </div>
@@ -136,7 +143,7 @@ export default function Home() {
                 <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <select
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={(e) => { setCurrentPage(1); setSelectedCategory(e.target.value); }}
                   className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All Categories</option>
@@ -152,7 +159,7 @@ export default function Home() {
         </motion.div>
 
         {/* Questions List */}
-        {loading ? (
+        {questionsLoading ? (
           <div className="flex justify-center items-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
