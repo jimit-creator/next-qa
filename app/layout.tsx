@@ -6,6 +6,7 @@ import { MantineProvider, createTheme } from '@mantine/core';
 import { Providers } from './providers';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import ScrollToTopButton from '@/components/ui/ScrollToTopButton';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -48,6 +49,7 @@ export default function RootLayout({
             <Footer />
           </Providers>
         </MantineProvider>
+        <ScrollToTopButton />
       </body>
     </html>
   );
