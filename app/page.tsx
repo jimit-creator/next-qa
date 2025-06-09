@@ -104,158 +104,145 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Hero Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
-      >
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Master Your Interview Preparation
-        </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Comprehensive collection of interview questions and answers to help you succeed in your next technical interview.
-        </p>
-      </motion.div>
-
-      {/* Search and Filter */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white rounded-lg shadow-md p-6 mb-8"
-      >
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Search questions, answers, or tags..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        {/* Search and Filter */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-lg shadow-md p-4 mb-6"
+        >
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="flex-1">
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="Search questions, answers, or tags..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 text-sm"
+                />
+              </div>
+            </div>
+            <div className="md:w-56">
+              <div className="relative">
+                <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
-          <div className="md:w-64">
-            <div className="relative">
-              <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        </motion.div>
+
+        {/* Questions List */}
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {questions.map((question, index) => (
+              <motion.div
+                key={question._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
               >
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Questions List */}
-      {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {questions.map((question, index) => (
-            <motion.div
-              key={question._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card hover className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-sm text-blue-600 font-medium">
-                        {question.categoryName}
-                      </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
-                        {question.difficulty}
-                      </span>
+                <Card hover className="p-4 hover:border-blue-200 transition-colors">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">
+                          {question.categoryName}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
+                          {question.difficulty}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-semibold text-gray-900 mb-3">
+                        {question.question}
+                      </h3>
+                      <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          {question.answer}
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      {question.question}
-                    </h3>
+                    <button
+                      onClick={() => toggleBookmark(question._id!)}
+                      className={`p-1.5 rounded-lg transition-colors ml-3 ${
+                        bookmarks.includes(question._id!)
+                          ? 'text-red-600 bg-red-50 hover:bg-red-100'
+                          : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                      }`}
+                    >
+                      <FiHeart className={`w-4 h-4 ${bookmarks.includes(question._id!) ? 'fill-current' : ''}`} />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => toggleBookmark(question._id!)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      bookmarks.includes(question._id!)
-                        ? 'text-red-600 bg-red-50 hover:bg-red-100'
-                        : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
-                    }`}
-                  >
-                    <FiHeart className={`w-5 h-5 ${bookmarks.includes(question._id!) ? 'fill-current' : ''}`} />
-                  </button>
-                </div>
 
-                <div className="prose prose-sm max-w-none">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-gray-700 leading-relaxed">
-                      {question.answer}
-                    </p>
-                  </div>
-                </div>
+                  {question.tags && question.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {question.tags.map((tag, tagIndex) => (
+                        <span
+                          key={tagIndex}
+                          className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              </motion.div>
+            ))}
 
-                {question.tags && question.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {question.tags.map((tag, tagIndex) => (
-                      <span
-                        key={tagIndex}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </Card>
-            </motion.div>
-          ))}
+            {questions.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-sm text-gray-500">No questions found matching your criteria.</p>
+              </div>
+            )}
 
-          {questions.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No questions found matching your criteria.</p>
-            </div>
-          )}
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-2 mt-8">
-              <Button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                variant="outline"
-              >
-                Previous
-              </Button>
-              
-              <span className="px-4 py-2 text-gray-700">
-                Page {currentPage} of {totalPages}
-              </span>
-              
-              <Button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                variant="outline"
-              >
-                Next
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center space-x-3 mt-6">
+                <Button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  variant="outline"
+                  size="sm"
+                >
+                  Previous
+                </Button>
+                
+                <span className="px-3 py-1 text-sm text-gray-700 font-medium">
+                  Page {currentPage} of {totalPages}
+                </span>
+                
+                <Button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  variant="outline"
+                  size="sm"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -4,12 +4,13 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter, FiArrowLeft } from 'react-icons/fi';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Modal from '@/components/ui/Modal';
 import { Question, Category } from '@/types';
+import Link from 'next/link';
 
 export default function QuestionsPage() {
   const { data: session, status } = useSession();
@@ -174,203 +175,217 @@ export default function QuestionsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex justify-between items-center mb-8"
-      >
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Questions</h1>
-          <p className="text-gray-600 mt-2">Manage interview questions</p>
-        </div>
-        <Button onClick={() => setIsModalOpen(true)}>
-          <FiPlus className="w-4 h-4 mr-2" />
-          Add Question
-        </Button>
-      </motion.div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-between items-center mb-6"
+        >
+          <div className="flex items-center gap-4">
+            <Link href="/admin" className="text-blue-600 hover:text-blue-800 transition-colors">
+              <FiArrowLeft className="w-5 h-5" />
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Questions</h1>
+              <p className="text-sm text-gray-600 mt-1">Manage and organize questions</p>
+            </div>
+          </div>
+          <Button onClick={() => setIsModalOpen(true)} size="sm">
+            <FiPlus className="w-4 h-4 mr-1.5" />
+            Add Question
+          </Button>
+        </motion.div>
 
-      {/* Search and Filter */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white rounded-lg shadow-md p-6 mb-8"
-      >
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Search questions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+        {/* Search and Filter */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-lg shadow-md p-4 mb-6"
+        >
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="flex-1">
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="Search questions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 text-sm"
+                />
+              </div>
+            </div>
+            <div className="md:w-56">
+              <div className="relative">
+                <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Questions List */}
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {questions.map((question, index) => (
+              <motion.div
+                key={question._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">
+                          {question.categoryName}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
+                          {question.difficulty}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-semibold text-gray-900 mb-2">
+                        {question.question}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-2">
+                        {question.answer}
+                      </p>
+                    </div>
+                    <div className="flex space-x-1.5 ml-3">
+                      <button
+                        onClick={() => handleEdit(question)}
+                        className="p-1.5 text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <FiEdit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(question._id!)}
+                        className="p-1.5 text-red-600 hover:text-red-800 transition-colors"
+                      >
+                        <FiTrash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {question.tags && question.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {question.tags.map((tag, tagIndex) => (
+                        <span
+                          key={tagIndex}
+                          className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              </motion.div>
+            ))}
+
+            {questions.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-sm text-gray-500">No questions found.</p>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center space-x-3 mt-6">
+                <Button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  variant="outline"
+                  size="sm"
+                >
+                  Previous
+                </Button>
+                
+                <span className="px-3 py-1 text-sm text-gray-700 font-medium">
+                  Page {currentPage} of {totalPages}
+                </span>
+                
+                <Button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  variant="outline"
+                  size="sm"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Add/Edit Modal */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingQuestion(null);
+            setFormData({
+              question: '',
+              answer: '',
+              categoryId: '',
+              difficulty: 'Medium',
+              tags: '',
+            });
+          }}
+          title={editingQuestion ? 'Edit Question' : 'Add Question'}
+          size="md"
+        >
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Question"
+              value={formData.question}
+              onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+              required
+              placeholder="Enter the interview question"
+              className="text-sm"
+            />
+            
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Answer
+              </label>
+              <textarea
+                value={formData.answer}
+                onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
+                required
+                rows={4}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter the answer"
               />
             </div>
-          </div>
-          <div className="md:w-64">
-            <div className="relative">
-              <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </motion.div>
 
-      {/* Questions List */}
-      <div className="space-y-6">
-        {questions.map((question, index) => (
-          <motion.div
-            key={question._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm text-blue-600 font-medium">
-                      {question.categoryName}
-                    </span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
-                      {question.difficulty}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {question.question}
-                  </h3>
-                  <p className="text-gray-600 text-sm line-clamp-2">
-                    {question.answer}
-                  </p>
-                </div>
-                <div className="flex space-x-2 ml-4">
-                  <button
-                    onClick={() => handleEdit(question)}
-                    className="text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    <FiEdit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(question._id!)}
-                    className="text-red-600 hover:text-red-800 transition-colors"
-                  >
-                    <FiTrash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {question.tags && question.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {question.tags.map((tag, tagIndex) => (
-                    <span
-                      key={tagIndex}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </Card>
-          </motion.div>
-        ))}
-
-        {questions.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No questions found.</p>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center space-x-2 mt-8">
-            <Button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              variant="outline"
-            >
-              Previous
-            </Button>
-            
-            <span className="px-4 py-2 text-gray-700">
-              Page {currentPage} of {totalPages}
-            </span>
-            
-            <Button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              variant="outline"
-            >
-              Next
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Add/Edit Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingQuestion(null);
-          setFormData({
-            question: '',
-            answer: '',
-            categoryId: '',
-            difficulty: 'Medium',
-            tags: '',
-          });
-        }}
-        title={editingQuestion ? 'Edit Question' : 'Add Question'}
-        size="lg"
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Question"
-            value={formData.question}
-            onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-            required
-            placeholder="Enter the interview question"
-          />
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Answer
-            </label>
-            <textarea
-              value={formData.answer}
-              onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-              required
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter the answer"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Category
               </label>
               <select
                 value={formData.categoryId}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Select a category</option>
                 {categories.map((category) => (
@@ -382,52 +397,55 @@ export default function QuestionsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Difficulty
               </label>
               <select
                 value={formData.difficulty}
                 onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard' })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="Easy">Easy</option>
                 <option value="Medium">Medium</option>
                 <option value="Hard">Hard</option>
               </select>
             </div>
-          </div>
 
-          <Input
-            label="Tags (comma-separated)"
-            value={formData.tags}
-            onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-            placeholder="e.g., javascript, async, promises"
-          />
+            <Input
+              label="Tags (comma-separated)"
+              value={formData.tags}
+              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              placeholder="e.g. javascript, react, node"
+              className="text-sm"
+            />
 
-          <div className="flex justify-end space-x-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setIsModalOpen(false);
-                setEditingQuestion(null);
-                setFormData({
-                  question: '',
-                  answer: '',
-                  categoryId: '',
-                  difficulty: 'Medium',
-                  tags: '',
-                });
-              }}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" loading={submitting}>
-              {editingQuestion ? 'Update' : 'Create'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingQuestion(null);
+                  setFormData({
+                    question: '',
+                    answer: '',
+                    categoryId: '',
+                    difficulty: 'Medium',
+                    tags: '',
+                  });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" loading={submitting} size="sm">
+                {editingQuestion ? 'Update' : 'Create'}
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      </div>
     </div>
   );
 }
