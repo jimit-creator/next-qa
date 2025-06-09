@@ -1,0 +1,147 @@
+@import '@mantine/tiptap/styles.css';
+
+/* Rich Text Editor Styles */
+.ProseMirror {
+  min-height: 200px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background-color: white;
+}
+
+.ProseMirror:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Toolbar Styles */
+.mantine-RichTextEditor-toolbar {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-bottom: none;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.mantine-RichTextEditor-controlsGroup {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background-color: white;
+  padding: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.mantine-RichTextEditor-control {
+  color: #64748b;
+  border-radius: 0.25rem;
+  padding: 0.375rem;
+  transition: all 0.2s;
+}
+
+.mantine-RichTextEditor-control:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.mantine-RichTextEditor-control[data-active="true"] {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+/* Content Styles */
+.ProseMirror p {
+  margin: 0;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+  margin: 1em 0 0.5em;
+  line-height: 1.2;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding: 0 1rem;
+}
+
+.ProseMirror blockquote {
+  padding-left: 1rem;
+  border-left: 2px solid #e2e8f0;
+  margin: 1rem 0;
+}
+
+.ProseMirror code {
+  background-color: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-size: 0.875em;
+}
+
+.ProseMirror pre {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 0.875em;
+}
+
+.ProseMirror a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.ProseMirror a:hover {
+  color: #2563eb;
+}
+
+/* Link Editor Styles */
+.mantine-RichTextEditor-linkEditor {
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.mantine-RichTextEditor-linkEditor input {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.mantine-RichTextEditor-linkEditor input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Button Styles */
+.mantine-RichTextEditor-control[data-control="link"] {
+  color: #3b82f6;
+}
+
+.mantine-RichTextEditor-control[data-control="link"]:hover {
+  background-color: #eff6ff;
+}
+
+.mantine-RichTextEditor-control[data-control="unlink"] {
+  color: #ef4444;
+}
+
+.mantine-RichTextEditor-control[data-control="unlink"]:hover {
+  background-color: #fef2f2;
+} 

@@ -103,6 +103,11 @@ export default function Home() {
     }
   };
 
+  // Helper function to render HTML content safely
+  const renderHtmlContent = (html: string) => {
+    return { __html: html };
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -175,9 +180,10 @@ export default function Home() {
                         {question.question}
                       </h3>
                       <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                        <p className="text-sm text-gray-700 leading-relaxed">
-                          {question.answer}
-                        </p>
+                        <div 
+                          className="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={renderHtmlContent(question.answer)}
+                        />
                       </div>
                     </div>
                     {/* <button
@@ -243,6 +249,78 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <style jsx global>{`
+        .prose h1, .prose h2, .prose h3 {
+          margin-top: 0.5em;
+          margin-bottom: 0.5em;
+          font-weight: 600;
+        }
+        
+        .prose h1 { font-size: 1.25em; }
+        .prose h2 { font-size: 1.125em; }
+        .prose h3 { font-size: 1em; }
+        
+        .prose p {
+          margin-bottom: 0.75em;
+        }
+        
+        .prose ul, .prose ol {
+          margin: 0.5em 0;
+          padding-left: 1.5em;
+        }
+        
+        .prose li {
+          margin-bottom: 0.25em;
+        }
+        
+        .prose blockquote {
+          border-left: 3px solid #e5e7eb;
+          padding-left: 1em;
+          margin: 1em 0;
+          font-style: italic;
+          color: #6b7280;
+        }
+        
+        .prose code {
+          background-color: #f3f4f6;
+          padding: 0.125em 0.25em;
+          border-radius: 0.25em;
+          font-size: 0.875em;
+        }
+        
+        .prose pre {
+          background-color: #1f2937;
+          color: #f9fafb;
+          padding: 1em;
+          border-radius: 0.5em;
+          overflow-x: auto;
+          margin: 1em 0;
+        }
+        
+        .prose pre code {
+          background-color: transparent;
+          padding: 0;
+          color: inherit;
+        }
+        
+        .prose a {
+          color: #2563eb;
+          text-decoration: underline;
+        }
+        
+        .prose a:hover {
+          color: #1d4ed8;
+        }
+        
+        .prose strong {
+          font-weight: 600;
+        }
+        
+        .prose em {
+          font-style: italic;
+        }
+      `}</style>
     </div>
   );
 }

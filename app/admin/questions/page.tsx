@@ -9,6 +9,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Modal from '@/components/ui/Modal';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Question, Category } from '@/types';
 import Link from 'next/link';
 
@@ -162,6 +163,13 @@ export default function QuestionsPage() {
     }
   };
 
+  // Helper function to strip HTML tags for display
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   if (status === 'loading' || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -266,7 +274,7 @@ export default function QuestionsPage() {
                         {question.question}
                       </h3>
                       <p className="text-sm text-gray-600 line-clamp-2">
-                        {question.answer}
+                        {stripHtml(question.answer)}
                       </p>
                     </div>
                     <div className="flex space-x-1.5 ml-3">
@@ -351,7 +359,7 @@ export default function QuestionsPage() {
             });
           }}
           title={editingQuestion ? 'Edit Question' : 'Add Question'}
-          size="md"
+          size="lg"
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
@@ -367,13 +375,10 @@ export default function QuestionsPage() {
               <label className="block text-xs font-medium text-gray-700 mb-1">
                 Answer
               </label>
-              <textarea
+              <RichTextEditor
                 value={formData.answer}
-                onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                required
-                rows={4}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter the answer"
+                onChange={(value) => setFormData({ ...formData, answer: value })}
+                placeholder="Enter the detailed answer with formatting..."
               />
             </div>
 
