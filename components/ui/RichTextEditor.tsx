@@ -7,6 +7,7 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
+import CodeBlock from '@tiptap/extension-code-block';
 import { useEffect } from 'react';
 
 interface RichTextEditorProps {
@@ -25,6 +26,7 @@ export default function RichTextEditor({ value, onChange, error, placeholder }: 
       Superscript,
       SubScript,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      CodeBlock,
     ],
     content: value,
     onUpdate: ({ editor }) => {
@@ -48,7 +50,7 @@ export default function RichTextEditor({ value, onChange, error, placeholder }: 
             <MantineRichTextEditor.Underline />
             <MantineRichTextEditor.Strikethrough />
             <MantineRichTextEditor.ClearFormatting />
-            <MantineRichTextEditor.Code />
+            <MantineRichTextEditor.CodeBlock />
           </MantineRichTextEditor.ControlsGroup>
 
           <MantineRichTextEditor.ControlsGroup>

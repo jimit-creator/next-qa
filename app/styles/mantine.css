@@ -144,4 +144,230 @@
 
 .mantine-RichTextEditor-control[data-control="unlink"]:hover {
   background-color: #fef2f2;
+}
+
+/* Browse Questions View Styles */
+.question-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.question-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #1e293b;
+}
+
+.question-content h1,
+.question-content h2,
+.question-content h3,
+.question-content h4,
+.question-content h5,
+.question-content h6 {
+  color: #0f172a;
+  margin: 1.5rem 0 1rem;
+  font-weight: 600;
+}
+
+.question-content h1 { font-size: 1.875rem; }
+.question-content h2 { font-size: 1.5rem; }
+.question-content h3 { font-size: 1.25rem; }
+.question-content h4 { font-size: 1.125rem; }
+.question-content h5 { font-size: 1rem; }
+.question-content h6 { font-size: 0.875rem; }
+
+.question-content ul,
+.question-content ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.question-content li {
+  margin: 0.5rem 0;
+  color: #1e293b;
+}
+
+.question-content blockquote {
+  border-left: 4px solid #3b82f6;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  background-color: #f8fafc;
+  border-radius: 0.25rem;
+  color: #475569;
+}
+
+.question-content code {
+  background-color: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-size: 0.875em;
+  color: #0f172a;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  border: 1px solid #e2e8f0;
+}
+
+.question-content pre {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  border: 1px solid #334155;
+}
+
+.question-content pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+  border: none;
+}
+
+.question-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.question-content a:hover {
+  color: #2563eb;
+}
+
+.question-content strong {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.question-content em {
+  font-style: italic;
+  color: #334155;
+}
+
+.question-content u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* New .prose-content class for displayed HTML */
+.prose-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.prose-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 1.5rem 0 1rem;
+  color: #0f172a;
+}
+
+.prose-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem;
+  color: #1e293b;
+}
+
+.prose-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+  color: #334155;
+}
+
+.prose-content h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+  color: #334155;
+}
+
+.prose-content h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  color: #334155;
+}
+
+.prose-content h6 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  color: #334155;
+}
+
+.prose-content ul,
+.prose-content ol {
+  padding: 0 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.prose-content li {
+  margin: 0.25rem 0;
+}
+
+.prose-content blockquote {
+  padding: 1rem 1.5rem;
+  border-left: 4px solid #3b82f6;
+  margin: 1rem 0;
+  background-color: #f8fafc;
+  border-radius: 0.25rem;
+  font-style: italic;
+  color: #475569;
+}
+
+.prose-content code {
+  background-color: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-size: 0.875em;
+  color: #0f172a;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  border: 1px solid #e2e8f0;
+}
+
+.prose-content pre {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin: 0.75rem 0;
+  overflow-x: auto;
+  border: 1px solid #334155;
+  white-space: pre-wrap;
+}
+
+.prose-content pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 0.875em;
+  border: none;
+}
+
+.prose-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose-content a:hover {
+  color: #2563eb;
+}
+
+.prose-content strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.prose-content em {
+  font-style: italic;
+  color: #334155;
+}
+
+.prose-content u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 } 
