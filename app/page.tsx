@@ -180,7 +180,7 @@ export default function Home() {
                         </p>
                       </div>
                     </div>
-                    <button
+                    {/* <button
                       onClick={() => toggleBookmark(question._id!)}
                       className={`p-1.5 rounded-lg transition-colors ml-3 ${
                         bookmarks.includes(question._id!)
@@ -189,7 +189,7 @@ export default function Home() {
                       }`}
                     >
                       <FiHeart className={`w-4 h-4 ${bookmarks.includes(question._id!) ? 'fill-current' : ''}`} />
-                    </button>
+                    </button> */}
                   </div>
 
                   {question.tags && question.tags.length > 0 && (
