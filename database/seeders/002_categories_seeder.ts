@@ -45,24 +45,6 @@ const seeder: Seeder = {
         description: 'Database questions covering SQL, NoSQL, MongoDB, PostgreSQL, and database design principles',
         createdAt: new Date(),
         updatedAt: new Date(),
-      },
-      {
-        name: 'System Design',
-        description: 'System design questions covering scalability, architecture patterns, and distributed systems',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: 'Algorithms',
-        description: 'Algorithm and data structure questions covering sorting, searching, trees, graphs, and complexity analysis',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: 'CSS',
-        description: 'CSS questions covering flexbox, grid, animations, responsive design, and modern CSS features',
-        createdAt: new Date(),
-        updatedAt: new Date(),
       }
     ];
     

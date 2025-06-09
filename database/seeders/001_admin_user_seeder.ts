@@ -9,7 +9,7 @@ const seeder: Seeder = {
     const users = db.collection('users');
     
     // Check if admin user already exists
-    const existingAdmin = await users.findOne({ email: 'admin@example.com' });
+    const existingAdmin = await users.findOne({ email: 'admin@jimit.dev' });
     
     if (existingAdmin) {
       console.log('Admin user already exists, skipping...');
@@ -17,17 +17,17 @@ const seeder: Seeder = {
     }
     
     // Create admin user
-    const hashedPassword = await bcrypt.hash('admin123', 12);
+    const hashedPassword = await bcrypt.hash('X9t#4mWz!Qe2', 12);
     
     await users.insertOne({
       name: 'Admin',
-      email: 'admin@example.com',
+      email: 'admin@jimit.dev',
       password: hashedPassword,
       role: 'admin',
       createdAt: new Date(),
     });
     
-    console.log('Created admin user: admin@example.com / admin123');
+    console.log('Created admin user: admin@jimit.dev / X9t#4mWz!Qe2');
   }
 };
 
