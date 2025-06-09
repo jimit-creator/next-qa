@@ -8,7 +8,14 @@ import { FiMenu, FiX, FiUser, FiLogOut, FiSettings } from 'react-icons/fi';
 
 export default function Header() {
   const { data: session } = useSession();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsMobileMenuOpen(false);
+    setIsUserMenuOpen(false);
+    await signOut();
+  };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
@@ -38,14 +45,14 @@ export default function Header() {
             {session ? (
               <div className="relative">
                 <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
                 >
                   <FiUser className="w-5 h-5" />
                   <span>{session.user.name}</span>
                 </button>
                 
-                {isMenuOpen && (
+                {isUserMenuOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -55,14 +62,14 @@ export default function Header() {
                       <Link
                         href="/admin"
                         className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50"
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => setIsUserMenuOpen(false)}
                       >
                         <FiSettings className="w-4 h-4" />
                         <span>Admin Panel</span>
                       </Link>
                     )}
                     <button
-                      onClick={() => signOut()}
+                      onClick={handleSignOut}
                       className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50 w-full text-left"
                     >
                       <FiLogOut className="w-4 h-4" />
@@ -82,32 +89,40 @@ export default function Header() {
           </div>
 
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden text-gray-700 hover:text-blue-600"
           >
-            {isMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+            {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
           </button>
         </div>
 
         {/* Mobile menu */}
-        {isMenuOpen && (
+        {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             className="md:hidden border-t border-gray-200 py-4"
           >
             <div className="flex flex-col space-y-4">
-              <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <Link 
+                href="/" 
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 Browse Questions
               </Link>
               {session?.user?.role === 'admin' && (
-                <Link href="/admin" className="text-gray-700 hover:text-blue-600 transition-colors">
+                <Link 
+                  href="/admin" 
+                  className="text-gray-700 hover:text-blue-600 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
                   Admin Panel
                 </Link>
               )}
               {session ? (
                 <button
-                  onClick={() => signOut()}
+                  onClick={handleSignOut}
                   className="text-left text-gray-700 hover:text-blue-600 transition-colors"
                 >
                   Sign Out
@@ -116,6 +131,7 @@ export default function Header() {
                 <Link
                   href="/admin/login"
                   className="text-blue-600 hover:text-blue-700 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Admin Login
                 </Link>
