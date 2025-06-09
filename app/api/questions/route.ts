@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
     const categoryId = searchParams.get('categoryId');
     const search = searchParams.get('search');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const sort = searchParams.get('sort') || 'oldest';
     const skip = (page - 1) * limit;
 
     const client = await clientPromise;
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     const result = await questions
       .find(filter)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: sort === 'newest' ? -1 : 1 })
       .skip(skip)
       .limit(limit)
       .toArray();

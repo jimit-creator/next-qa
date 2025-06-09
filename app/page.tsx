@@ -36,7 +36,7 @@ export default function Home() {
   const categoriesLoading = !categoriesData && !categoriesError;
 
   // Use SWR for questions
-  const questionsUrl = `/api/questions?page=${currentPage}&limit=10&search=${searchTerm}&categoryId=${selectedCategory}`;
+  const questionsUrl = `/api/questions?page=${currentPage}&limit=20&search=${searchTerm}&categoryId=${selectedCategory}`;
   const { data: questionsData, error: questionsError, mutate } = useSWR<{
     questions: Question[];
     total: number;
