@@ -40,7 +40,7 @@ export default function Home() {
   const categoriesLoading = !categoriesData && !categoriesError;
 
   // Use SWR for questions with debounced search
-  const questionsUrl = `/api/questions?page=${currentPage}&limit=${pageSize}&search=${debouncedSearchTerm}&category=${selectedCategory}`;
+  const questionsUrl = `/api/questions?page=${currentPage}&limit=${pageSize}&search=${debouncedSearchTerm}&categoryId=${selectedCategory}`;
   const { data: questionsData, error: questionsError, mutate } = useSWR<{
     questions: Question[];
     total: number;

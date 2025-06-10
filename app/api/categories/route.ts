@@ -8,8 +8,36 @@ export async function GET() {
   try {
     const client = await clientPromise;
     const categories = client.db('interview_qa').collection('categories');
+    const questions = client.db('interview_qa').collection('questions');
     
-    const result = await categories.find({}).sort({ createdAt: -1 }).toArray();
+    const result = await categories.aggregate([
+      {
+        $lookup: {
+          from: 'questions',
+          localField: '_id',
+          foreignField: 'categoryId',
+          as: 'questions'
+        }
+      },
+      {
+        $addFields: {
+          questionCount: { $size: '$questions' }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          description: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          questionCount: 1
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      }
+    ]).toArray();
     
     return NextResponse.json(result);
   } catch (error) {
