@@ -30,6 +30,11 @@ const theme = createTheme({
 export const metadata: Metadata = {
   title: 'Interview Q&A Platform',
   description: 'A platform for interview questions and answers',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
