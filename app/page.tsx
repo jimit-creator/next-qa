@@ -117,17 +117,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      <div className="py-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-6"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Welcome to Question Bank
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm text-gray-600 max-w-2xl mx-auto">
             Explore our collection of carefully curated questions and answers. 
             Find solutions, learn new concepts, and enhance your knowledge.
           </p>
@@ -138,28 +138,28 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-xl shadow-lg p-6 mb-8"
+          className="bg-white rounded-lg shadow-md p-4 mb-4"
         >
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-3">
             <div className="flex-1">
               <div className="relative">
-                <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   type="text"
                   placeholder="Search questions, answers, or tags..."
                   value={searchTerm}
                   onChange={(e) => { setCurrentPage(1); setSearchTerm(e.target.value); }}
-                  className="pl-12 text-base py-3"
+                  className="pl-9 text-sm py-2"
                 />
               </div>
             </div>
             <div className="md:w-64">
               <div className="relative">
-                <FiFilter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <select
                   value={selectedCategory}
                   onChange={(e) => { setCurrentPage(1); setSelectedCategory(e.target.value); }}
-                  className="w-full pl-12 pr-4 py-3 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All Categories</option>
                   {categories.map((category) => (
@@ -175,46 +175,46 @@ export default function Home() {
 
         {/* Questions List */}
         {questionsLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="flex justify-center items-center py-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
           </div>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="space-y-6"
+            className="space-y-3"
           >
             {questions.map((question, index) => (
-              <Card key={question._id} className="p-6 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start gap-6">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-lg">
+              <Card key={question._id} className="p-4 hover:shadow-md transition-all duration-300">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-sm">
                     {(currentPage - 1) * 20 + index + 1}
                   </div>
                   <div className="flex-grow">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-sm text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-sm text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">
                         {question.categoryName}
                       </span>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(question.difficulty)}`}>
+                      <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${getDifficultyColor(question.difficulty)}`}>
                         {question.difficulty}
                       </span>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">
                       {question.question}
                     </h3>
-                    <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 mb-4">
+                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-100 mb-2">
                       <div
-                        className="prose-content text-gray-700 leading-relaxed"
+                        className="prose-content text-sm text-gray-700 leading-relaxed"
                         dangerouslySetInnerHTML={renderHtmlContent(question.answer)}
                       />
                     </div>
                     {question.tags && question.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {question.tags.map((tag, tagIndex) => (
                           <span
                             key={tagIndex}
-                            className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full"
+                            className="px-2 py-0.5 bg-blue-50 text-blue-700 text-sm rounded-full"
                           >
                             #{tag}
                           </span>
@@ -227,32 +227,32 @@ export default function Home() {
             ))}
 
             {questions.length === 0 && (
-              <div className="text-center py-12 bg-white rounded-xl shadow-sm">
-                <p className="text-gray-500 text-lg">No questions found matching your criteria.</p>
+              <div className="text-center py-6 bg-white rounded-lg shadow-sm">
+                <p className="text-sm text-gray-500">No questions found matching your criteria.</p>
               </div>
             )}
+          </motion.div>
+        )}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="flex justify-center mt-8 gap-2"
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex justify-center mt-4 gap-1"
+          >
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? 'primary' : 'outline'}
+                size="sm"
+                onClick={() => setCurrentPage(page)}
+                className="w-8 h-8 text-sm"
               >
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? 'primary' : 'outline'}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className="w-10"
-                  >
-                    {page}
-                  </Button>
-                ))}
-              </motion.div>
-            )}
+                {page}
+              </Button>
+            ))}
           </motion.div>
         )}
       </div>
