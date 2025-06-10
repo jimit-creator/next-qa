@@ -22,6 +22,7 @@ export default function CategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -43,6 +44,7 @@ export default function CategoriesPage() {
       console.error('Failed to fetch categories:', error);
     } finally {
       setLoading(false);
+      setCategoriesLoading(false);
     }
   };
 
@@ -144,72 +146,98 @@ export default function CategoriesPage() {
           </Button>
         </motion.div>
 
-        {/* Search */}
+        {/* Search and Add Category */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-6"
+          className="bg-white rounded-lg shadow-md p-3 mb-4"
         >
-          <div className="relative max-w-md">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              type="text"
-              placeholder="Search categories..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 text-sm"
-            />
+          <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex-1">
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
+                <Input
+                  type="text"
+                  placeholder="Search categories..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8 text-sm h-8"
+                />
+              </div>
+            </div>
+            <Button
+              onClick={() => {
+                setEditingCategory(null);
+                setFormData({ name: '', description: '' });
+                setIsModalOpen(true);
+              }}
+              className="h-8"
+            >
+              <FiPlus className="w-3.5 h-3.5 mr-1" />
+              Add Category
+            </Button>
           </div>
         </motion.div>
 
-        {/* Categories Grid */}
-        {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredCategories.map((category, index) => (
-              <motion.div
-                key={category._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card hover className="p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-base font-semibold text-gray-900">{category.name}</h3>
-                    <div className="flex space-x-1.5">
-                      <button
-                        onClick={() => handleEdit(category)}
-                        className="p-1.5 text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        <FiEdit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(category._id!)}
-                        className="p-1.5 text-red-600 hover:text-red-800 transition-colors"
-                      >
-                        <FiTrash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+        {/* Categories List */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-3 relative"
+        >
+          {categoriesLoading && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-[2px] z-10 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            </div>
+          )}
+          {filteredCategories.map((category, index) => (
+            <Card key={category._id} className="p-3 hover:shadow-md transition-all duration-300">
+              <div className="flex items-start justify-between">
+                <div className="flex-grow">
+                  <h3 className="text-sm font-medium text-gray-900 mb-1.5">
+                    {category.name}
+                  </h3>
+                  {category.description && (
+                    <p className="text-xs text-gray-500 mb-1.5">
+                      {category.description}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-gray-500">
+                      {category.questionCount || 0} questions
+                    </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">{category.description}</p>
-                  <div className="text-xs text-gray-500">
-                    Created: {new Date(category.createdAt).toLocaleDateString()}
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        )}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(category)}
+                    className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors p-1"
+                  >
+                    <FiEdit2 className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(category._id!)}
+                    className="text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors p-1"
+                  >
+                    <FiTrash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
 
-        {filteredCategories.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-sm text-gray-500">No categories found.</p>
-          </div>
-        )}
+          {!categoriesLoading && filteredCategories.length === 0 && (
+            <div className="text-center py-6 bg-white rounded-lg shadow-sm">
+              <p className="text-sm text-gray-500">No categories found matching your criteria.</p>
+            </div>
+          )}
+        </motion.div>
 
         {/* Add/Edit Modal */}
         <Modal
