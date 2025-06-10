@@ -118,22 +118,25 @@ export default function AdminQuestionsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this question?')) return;
+  const handleDelete = async (id: string | undefined) => {
+    if (!id) return;
+    
+    if (window.confirm('Are you sure you want to delete this question?')) {
+      try {
+        const response = await fetch(`/api/questions/${id}`, {
+          method: 'DELETE',
+        });
 
-    try {
-      const response = await fetch(`/api/questions/${id}`, {
-        method: 'DELETE',
-      });
+        if (!response.ok) {
+          throw new Error('Failed to delete question');
+        }
 
-      if (response.ok) {
-        mutate(); // Revalidate questions data after successful deletion
-      } else {
-        const error = await response.json();
-        setError(error.message || 'Failed to delete question');
+        // Refresh the questions list
+        mutate();
+      } catch (error) {
+        console.error('Error deleting question:', error);
+        alert('Failed to delete question. Please try again.');
       }
-    } catch (error) {
-      setError('An error occurred while deleting the question');
     }
   };
 
