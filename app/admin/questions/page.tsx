@@ -139,7 +139,8 @@ export default function AdminQuestionsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string | undefined) => {
+    if (!id) return;
     if (!confirm('Are you sure you want to delete this question?')) {
       return;
     }
@@ -327,7 +328,7 @@ export default function AdminQuestionsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDelete(question._id)}
+                        onClick={() => question._id && handleDelete(question._id)}
                         className="text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors p-1"
                       >
                         <FiTrash2 className="w-3.5 h-3.5" />

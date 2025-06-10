@@ -53,19 +53,19 @@ export default function Home() {
 
   // Debounce search term updates
   const debouncedSearch = useCallback(
-    debounce((term: string) => {
+    (term: string) => {
       setDebouncedSearchTerm(term);
       setCurrentPage(1); // Reset to first page on new search
-    }, 500),
-    []
+    },
+    [] // No dependencies needed as we're only using setState functions
   );
 
   // Update debounced search term when search term changes
   useEffect(() => {
-    debouncedSearch(searchTerm);
-    return () => {
-      debouncedSearch.cancel();
-    };
+    const timeoutId = setTimeout(() => {
+      debouncedSearch(searchTerm);
+    }, 500);
+    return () => clearTimeout(timeoutId);
   }, [searchTerm, debouncedSearch]);
 
   useEffect(() => {
