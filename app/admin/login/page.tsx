@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, HelpCircle } from 'lucide-react';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -16,6 +16,8 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
   const [showInitButton, setShowInitButton] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showEmailTooltip, setShowEmailTooltip] = useState(false);
+  const [showPasswordTooltip, setShowPasswordTooltip] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,7 +86,33 @@ export default function AdminLogin() {
         <Card className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
-              label="Email"
+              label={
+                <div className="flex items-center gap-2">
+                  Email
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onMouseEnter={() => setShowEmailTooltip(true)}
+                      onMouseLeave={() => setShowEmailTooltip(false)}
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                      aria-label="Email requirements"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </button>
+                    {showEmailTooltip && (
+                      <div className="absolute left-0 mt-2 w-64 p-3 bg-gray-900 text-white text-sm rounded-lg shadow-lg z-10">
+                        <div className="font-medium mb-1">Email Requirements:</div>
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>Must be a valid email format</li>
+                          <li>Example: admin@example.com</li>
+                          <li>Must be registered in the system</li>
+                        </ul>
+                        <div className="absolute -top-2 left-4 w-4 h-4 bg-gray-900 transform rotate-45"></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              }
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -93,7 +121,34 @@ export default function AdminLogin() {
             />
 
             <Input
-              label="Password"
+              label={
+                <div className="flex items-center gap-2">
+                  Password
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onMouseEnter={() => setShowPasswordTooltip(true)}
+                      onMouseLeave={() => setShowPasswordTooltip(false)}
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                      aria-label="Password requirements"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </button>
+                    {showPasswordTooltip && (
+                      <div className="absolute left-0 mt-2 w-64 p-3 bg-gray-900 text-white text-sm rounded-lg shadow-lg z-10">
+                        <div className="font-medium mb-1">Password Requirements:</div>
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>At least 8 characters</li>
+                          <li>Include uppercase and lowercase letters</li>
+                          <li>Include at least one number</li>
+                          <li>Include at least one special character</li>
+                        </ul>
+                        <div className="absolute -top-2 left-4 w-4 h-4 bg-gray-900 transform rotate-45"></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              }
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}

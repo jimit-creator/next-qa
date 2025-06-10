@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter, FiArrowLeft } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter, FiArrowLeft, FiEye } from 'react-icons/fi';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -21,7 +21,9 @@ export default function QuestionsPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [viewingQuestion, setViewingQuestion] = useState<Question | null>(null);
   const [formData, setFormData] = useState({
     question: '',
     answer: '',
@@ -144,6 +146,11 @@ export default function QuestionsPage() {
     }
   };
 
+  const handleViewAnswer = (question: Question) => {
+    setViewingQuestion(question);
+    setIsViewModalOpen(true);
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'Easy': return 'text-green-600 bg-green-100';
@@ -158,6 +165,11 @@ export default function QuestionsPage() {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
     return tmp.textContent || tmp.innerText || '';
+  };
+
+  // Helper function to render HTML content safely
+  const renderHtmlContent = (html: string) => {
+    return { __html: html };
   };
 
   if (status === 'loading' || categoriesLoading || questionsLoading) {
@@ -249,97 +261,101 @@ export default function QuestionsPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="space-y-4"
+          >
             {questions.map((question, index) => (
-              <motion.div
-                key={question._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">
-                          {question.categoryName}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
-                          {question.difficulty}
-                        </span>
+              <Card key={question._id} className="p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-sm">
+                    {(currentPage - 1) * 10 + index + 1}
+                  </div>
+                  <div className="flex-grow">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-grow">
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          {stripHtml(question.question)}
+                        </h3>
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
+                            {question.difficulty}
+                          </span>
+                          {question.categoryId && (
+                            <span className="text-sm text-gray-600">
+                              {categories.find(c => c._id === question.categoryId)?.name}
+                            </span>
+                          )}
+                        </div>
+                        {question.tags && question.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {question.tags.map((tag, i) => (
+                              <span
+                                key={i}
+                                className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <h3 className="text-base font-semibold text-gray-900 mb-2">
-                        {question.question}
-                      </h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {stripHtml(question.answer)}
-                      </p>
-                    </div>
-                    <div className="flex space-x-1.5 ml-3">
-                      <button
-                        onClick={() => handleEdit(question)}
-                        className="p-1.5 text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        <FiEdit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(question._id!)}
-                        className="p-1.5 text-red-600 hover:text-red-800 transition-colors"
-                      >
-                        <FiTrash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewAnswer(question)}
+                          className="text-gray-600 hover:text-blue-600"
+                        >
+                          <FiEye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(question)}
+                          className="text-gray-600 hover:text-blue-600"
+                        >
+                          <FiEdit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(question._id)}
+                          className="text-gray-600 hover:text-red-600"
+                        >
+                          <FiTrash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-
-                  {question.tags && question.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {question.tags.map((tag, tagIndex) => (
-                        <span
-                          key={tagIndex}
-                          className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </Card>
-              </motion.div>
+                </div>
+              </Card>
             ))}
+          </motion.div>
+        )}
 
-            {questions.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-sm text-gray-500">No questions found.</p>
-              </div>
-            )}
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center space-x-3 mt-6">
-                <Button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  size="sm"
-                >
-                  Previous
-                </Button>
-                
-                <span className="px-3 py-1 text-sm text-gray-700 font-medium">
-                  Page {currentPage} of {totalPages}
-                </span>
-                
-                <Button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  variant="outline"
-                  size="sm"
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex justify-center mt-8 gap-2"
+          >
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? 'primary' : 'outline'}
+                size="sm"
+                onClick={() => setCurrentPage(page)}
+                className="w-10"
+              >
+                {page}
+              </Button>
+            ))}
+          </motion.div>
         )}
 
         {/* Add/Edit Modal */}
@@ -447,6 +463,51 @@ export default function QuestionsPage() {
               </Button>
             </div>
           </form>
+        </Modal>
+
+        {/* View Answer Modal */}
+        <Modal
+          isOpen={isViewModalOpen}
+          onClose={() => {
+            setIsViewModalOpen(false);
+            setViewingQuestion(null);
+          }}
+          title="View Answer"
+          size="lg"
+        >
+          {viewingQuestion && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Question:</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div
+                    className="prose-content text-gray-700"
+                    dangerouslySetInnerHTML={renderHtmlContent(viewingQuestion.question || '')}
+                  />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Answer:</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div
+                    className="prose-content text-gray-700"
+                    dangerouslySetInnerHTML={renderHtmlContent(viewingQuestion.answer || '')}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsViewModalOpen(false);
+                    setViewingQuestion(null);
+                  }}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
         </Modal>
       </div>
     </div>

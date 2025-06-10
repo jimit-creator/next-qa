@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiSearch, FiFilter, FiBookmark, FiHeart } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiBookmark, FiHeart, FiArrowRight } from 'react-icons/fi';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -118,33 +118,48 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Welcome to Question Bank
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Explore our collection of carefully curated questions and answers. 
+            Find solutions, learn new concepts, and enhance your knowledge.
+          </p>
+        </motion.div>
+
         {/* Search and Filter */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-lg shadow-md p-4 mb-6"
+          className="bg-white rounded-xl shadow-lg p-6 mb-8"
         >
-          <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   type="text"
                   placeholder="Search questions, answers, or tags..."
                   value={searchTerm}
                   onChange={(e) => { setCurrentPage(1); setSearchTerm(e.target.value); }}
-                  className="pl-9 text-sm"
+                  className="pl-12 text-base py-3"
                 />
               </div>
             </div>
-            <div className="md:w-56">
+            <div className="md:w-64">
               <div className="relative">
-                <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <FiFilter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <select
                   value={selectedCategory}
                   onChange={(e) => { setCurrentPage(1); setSelectedCategory(e.target.value); }}
-                  className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-12 pr-4 py-3 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All Categories</option>
                   {categories.map((category) => (
@@ -164,96 +179,81 @@ export default function Home() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="space-y-6"
+          >
             {questions.map((question, index) => (
-              <motion.div
-                key={question._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card hover className="p-4 hover:border-blue-200 transition-colors">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">
-                          {question.categoryName}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
-                          {question.difficulty}
-                        </span>
-                      </div>
-                      <h3 className="text-base font-semibold text-gray-900 mb-3">
-                        {question.question}
-                      </h3>
-                      <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm mb-3">
-                        <div
-                          className="prose-content text-sm text-gray-700 leading-relaxed"
-                          dangerouslySetInnerHTML={renderHtmlContent(question.answer)}
-                        />
-                      </div>
-                    </div>
-                    {/* <button
-                      onClick={() => toggleBookmark(question._id!)}
-                      className={`p-1.5 rounded-lg transition-colors ml-3 ${
-                        bookmarks.includes(question._id!)
-                          ? 'text-red-600 bg-red-50 hover:bg-red-100'
-                          : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
-                      }`}
-                    >
-                      <FiHeart className={`w-4 h-4 ${bookmarks.includes(question._id!) ? 'fill-current' : ''}`} />
-                    </button> */}
+              <Card key={question._id} className="p-6 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-start gap-6">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-lg">
+                    {(currentPage - 1) * 20 + index + 1}
                   </div>
-
-                  {question.tags && question.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {question.tags.map((tag, tagIndex) => (
-                        <span
-                          key={tagIndex}
-                          className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
+                  <div className="flex-grow">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-sm text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
+                        {question.categoryName}
+                      </span>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(question.difficulty)}`}>
+                        {question.difficulty}
+                      </span>
                     </div>
-                  )}
-                </Card>
-              </motion.div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                      {question.question}
+                    </h3>
+                    <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 mb-4">
+                      <div
+                        className="prose-content text-gray-700 leading-relaxed"
+                        dangerouslySetInnerHTML={renderHtmlContent(question.answer)}
+                      />
+                    </div>
+                    {question.tags && question.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {question.tags.map((tag, tagIndex) => (
+                          <span
+                            key={tagIndex}
+                            className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Card>
             ))}
 
             {questions.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-sm text-gray-500">No questions found matching your criteria.</p>
+              <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+                <p className="text-gray-500 text-lg">No questions found matching your criteria.</p>
               </div>
             )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center space-x-3 mt-6">
-                <Button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  size="sm"
-                >
-                  Previous
-                </Button>
-                
-                <span className="px-3 py-1 text-sm text-gray-700 font-medium">
-                  Page {currentPage} of {totalPages}
-                </span>
-                
-                <Button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  variant="outline"
-                  size="sm"
-                >
-                  Next
-                </Button>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex justify-center mt-8 gap-2"
+              >
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? 'primary' : 'outline'}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className="w-10"
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         )}
       </div>
 
