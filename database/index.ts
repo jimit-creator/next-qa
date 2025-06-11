@@ -19,31 +19,47 @@ async function importFiles(directory: string) {
   return imports;
 }
 
-let migrations: any[] = [];
-let seeders: any[] = [];
+// Initialize arrays to store migrations and seeders
+let _migrations: any[] = [];
+let _seeders: any[] = [];
 
 // Initialize function to load migrations and seeders
 async function initialize() {
-  migrations = await importFiles(path.join(__dirname, 'migrations'));
-  seeders = await importFiles(path.join(__dirname, 'seeders'));
+  if (_migrations.length === 0) {
+    _migrations = await importFiles(path.join(__dirname, 'migrations'));
+  }
+  if (_seeders.length === 0) {
+    _seeders = await importFiles(path.join(__dirname, 'seeders'));
+  }
 }
 
 export const migrator = new DatabaseMigrator();
 export const seeder = new DatabaseSeeder();
 
+// Export getters for migrations and seeders
+export const migrations = {
+  get: async () => {
+    await initialize();
+    return _migrations;
+  }
+};
+
+export const seeders = {
+  get: async () => {
+    await initialize();
+    return _seeders;
+  }
+};
+
 // Helper functions
 export async function runMigrations() {
-  if (migrations.length === 0) {
-    await initialize();
-  }
-  await migrator.runMigrations(migrations);
+  const migrationFiles = await migrations.get();
+  await migrator.runMigrations(migrationFiles);
 }
 
 export async function runSeeders(force = false) {
-  if (seeders.length === 0) {
-    await initialize();
-  }
-  await seeder.runSeeders(seeders, force);
+  const seederFiles = await seeders.get();
+  await seeder.runSeeders(seederFiles, force);
 }
 
 export async function setupDatabase() {
@@ -62,8 +78,6 @@ export async function resetDatabase() {
 }
 
 export async function rollbackMigration(targetVersion: string) {
-  if (migrations.length === 0) {
-    await initialize();
-  }
-  await migrator.rollbackMigration(migrations, targetVersion);
+  const migrationFiles = await migrations.get();
+  await migrator.rollbackMigration(migrationFiles, targetVersion);
 }
