@@ -1,65 +1,42 @@
 import { DatabaseMigrator } from '@/lib/database/migrator';
 import { DatabaseSeeder } from '@/lib/database/seeder';
-import fs from 'fs';
-import path from 'path';
 
-// Function to dynamically import files from a directory
-async function importFiles(directory: string) {
-  const files = fs.readdirSync(directory)
-    .filter(file => file.endsWith('.ts'))
-    .sort(); // Sort to ensure correct order
+// Import migrations
+import migration001 from './migrations/001_create_users_collection';
+import migration002 from './migrations/002_create_categories_collection';
+import migration003 from './migrations/003_create_questions_collection';
+import migration004 from './migrations/004_create_bookmarks_collection';
 
-  const imports = await Promise.all(
-    files.map(async (file) => {
-      const filePath = path.join(directory, file);
-      return import(filePath);
-    })
-  );
+// Import seeders
+import seeder001 from './seeders/001_admin_user_seeder';
+import seeder002 from './seeders/002_categories_seeder';
+import seeder003 from './seeders/003_questions_seeder';
+import seeder008 from './seeders/008_questions_seeder';
 
-  return imports;
-}
+export const migrations = [
+  migration001,
+  migration002,
+  migration003,
+  migration004,
+];
 
-// Initialize arrays to store migrations and seeders
-let _migrations: any[] = [];
-let _seeders: any[] = [];
-
-// Initialize function to load migrations and seeders
-async function initialize() {
-  if (_migrations.length === 0) {
-    _migrations = await importFiles(path.join(__dirname, 'migrations'));
-  }
-  if (_seeders.length === 0) {
-    _seeders = await importFiles(path.join(__dirname, 'seeders'));
-  }
-}
+export const seeders = [
+  seeder001,
+  seeder002,
+  seeder003,
+  seeder008
+];
 
 export const migrator = new DatabaseMigrator();
 export const seeder = new DatabaseSeeder();
 
-// Export getters for migrations and seeders
-export const migrations = {
-  get: async () => {
-    await initialize();
-    return _migrations;
-  }
-};
-
-export const seeders = {
-  get: async () => {
-    await initialize();
-    return _seeders;
-  }
-};
-
 // Helper functions
 export async function runMigrations() {
-  const migrationFiles = await migrations.get();
-  await migrator.runMigrations(migrationFiles);
+  await migrator.runMigrations(migrations);
 }
 
 export async function runSeeders(force = false) {
-  const seederFiles = await seeders.get();
-  await seeder.runSeeders(seederFiles, force);
+  await seeder.runSeeders(seeders, force);
 }
 
 export async function setupDatabase() {
@@ -78,6 +55,5 @@ export async function resetDatabase() {
 }
 
 export async function rollbackMigration(targetVersion: string) {
-  const migrationFiles = await migrations.get();
-  await migrator.rollbackMigration(migrationFiles, targetVersion);
+  await migrator.rollbackMigration(migrations, targetVersion);
 }
