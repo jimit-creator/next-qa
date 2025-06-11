@@ -3,10 +3,9 @@ import { runMigrations, rollbackMigration, migrator, migrations } from '@/databa
 
 export async function GET() {
   try {
-    const migrationFiles = await migrations.get();
     const appliedMigrations = await migrator.getAppliedMigrations();
     
-    const status = migrationFiles.map(migration => ({
+    const status = migrations.map(migration => ({
       version: migration.version,
       name: migration.name,
       applied: appliedMigrations.includes(migration.version)
