@@ -19,11 +19,10 @@ async function main() {
         break;
       
       case 'status':
-        const appliedSeeders = await seeder.getAppliedSeeders();        
-        const seededFiles = await seeders.get();
+        const appliedSeeders = await seeder.getAppliedSeeders(); 
         console.log('Seeder Status:');
         console.log('==============');
-        for (const seederItem of seededFiles) {
+        for (const seederItem of seeders) {
           const status = appliedSeeders.includes(seederItem.name) ? '✓' : '✗';
           console.log(`${status} ${seederItem.name}`);
         }

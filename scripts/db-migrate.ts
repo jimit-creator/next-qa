@@ -21,12 +21,11 @@ async function main() {
       
       case 'status':
         const appliedMigrations = await migrator.getAppliedMigrations();
-        const migrationFiles = await migrations.get();
         
         console.log('Migration Status:');
         console.log('================');
         
-        for (const migration of migrationFiles) {
+        for (const migration of migrations) {
           const status = appliedMigrations.includes(migration.version) ? '✓' : '✗';
           console.log(`${status} ${migration.version} - ${migration.name}`);
         }
