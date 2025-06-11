@@ -3,10 +3,9 @@ import { runSeeders, seeder, seeders, resetDatabase } from '@/database';
 
 export async function GET() {
   try {
-    const seederFiles = await seeders.get();
     const appliedSeeders = await seeder.getAppliedSeeders();
     
-    const status = seederFiles.map(seederItem => ({
+    const status = seeders.map(seederItem => ({
       name: seederItem.name,
       applied: appliedSeeders.includes(seederItem.name)
     }));
