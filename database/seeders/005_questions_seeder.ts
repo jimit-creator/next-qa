@@ -2,7 +2,7 @@ import { Seeder } from '@/lib/database/seeder';
 import { Db, ObjectId } from 'mongodb';
 
 const seeder: Seeder = {
-  name: '003_questions_seeder',
+  name: '005_questions_seeder',
   
   async run(db: Db) {
     const questions = db.collection('questions');
@@ -11,10 +11,10 @@ const seeder: Seeder = {
     // Check if questions already exist
     const existingCount = await questions.countDocuments();
     
-    if (existingCount > 0) {
-      console.log('Questions already exist, skipping...');
-      return;
-    }
+    // if (existingCount > 0) {
+    //   console.log('Questions already exist, skipping...');
+    //   return;
+    // }
     
     // Get category IDs
     const categoryDocs = await categories.find({}).toArray();

@@ -11,6 +11,7 @@ import migration004 from './migrations/004_create_bookmarks_collection';
 import seeder001 from './seeders/001_admin_user_seeder';
 import seeder002 from './seeders/002_categories_seeder';
 import seeder003 from './seeders/003_questions_seeder';
+import seeder004 from './seeders/005_questions_seeder';
 
 export const migrations = [
   migration001,
@@ -23,6 +24,7 @@ export const seeders = [
   seeder001,
   seeder002,
   seeder003,
+  seeder004
 ];
 
 export const migrator = new DatabaseMigrator();

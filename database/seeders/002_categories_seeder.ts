@@ -16,36 +16,36 @@ const seeder: Seeder = {
     }
     
     const sampleCategories = [
-      {
-        name: 'JavaScript',
-        description: 'JavaScript programming language questions covering ES6+, async/await, closures, and more',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: 'React',
-        description: 'React framework questions including hooks, state management, lifecycle methods, and best practices',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: 'Node.js',
-        description: 'Node.js runtime environment questions covering APIs, middleware, databases, and server-side development',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
+      // {
+      //   name: 'JavaScript',
+      //   description: 'JavaScript programming language questions covering ES6+, async/await, closures, and more',
+      //   createdAt: new Date(),
+      //   updatedAt: new Date(),
+      // },
+      // {
+      //   name: 'React',
+      //   description: 'React framework questions including hooks, state management, lifecycle methods, and best practices',
+      //   createdAt: new Date(),
+      //   updatedAt: new Date(),
+      // },
+      // {
+      //   name: 'Node.js',
+      //   description: 'Node.js runtime environment questions covering APIs, middleware, databases, and server-side development',
+      //   createdAt: new Date(),
+      //   updatedAt: new Date(),
+      // },
       {
         name: 'TypeScript',
         description: 'TypeScript questions covering types, interfaces, generics, and advanced type system features',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      {
-        name: 'Database',
-        description: 'Database questions covering SQL, NoSQL, MongoDB, PostgreSQL, and database design principles',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
+      // {
+      //   name: 'Database',
+      //   description: 'Database questions covering SQL, NoSQL, MongoDB, PostgreSQL, and database design principles',
+      //   createdAt: new Date(),
+      //   updatedAt: new Date(),
+      // }
     ];
     
     await categories.insertMany(sampleCategories);

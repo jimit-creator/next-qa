@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { seeder, seeders, runSeeders, resetDatabase } from '@/database';
 
 async function main() {

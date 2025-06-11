@@ -10,6 +10,7 @@ import Card from '@/components/ui/Card';
 import { Question, Category } from '@/types';
 import Link from 'next/link';
 import useSWR from 'swr';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -73,7 +74,7 @@ export default function AdminQuestionsPage() {
   );
 
   // Use SWR for questions with debounced search
-  const questionsUrl = `/api/questions?page=${currentPage}&limit=${pageSize}&search=${debouncedSearchTerm}&category=${selectedCategory}`;
+  const questionsUrl = `/api/questions?page=${currentPage}&limit=${pageSize}&search=${debouncedSearchTerm}&categoryId=${selectedCategory}`;
   const { data: questionsData, error: questionsError, mutate } = useSWR<{
     questions: Question[];
     total: number;
@@ -105,9 +106,32 @@ export default function AdminQuestionsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
+
+    // Validate required fields
+    if (!formData.question.trim()) {
+      setError('Question is required');
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.answer.trim()) {
+      setError('Answer is required');
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.categoryId) {
+      setError('Category is required');
+      setSubmitting(false);
+      return;
+    }
+    if (!formData.difficulty) {
+      setError('Difficulty is required');
+      setSubmitting(false);
+      return;
+    }
 
     try {
-      const url = editingQuestion ? `/api/questions/${editingQuestion._id}` : '/api/questions';
+      const url = editingQuestion ? `/api/questions?id=${editingQuestion._id}` : '/api/questions';
       const method = editingQuestion ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -115,11 +139,15 @@ export default function AdminQuestionsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          _id: editingQuestion?._id, // Include _id for PUT requests
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save question');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save question');
       }
 
       await mutate();
@@ -134,6 +162,7 @@ export default function AdminQuestionsPage() {
       });
     } catch (error) {
       console.error('Error saving question:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save question');
     } finally {
       setSubmitting(false);
     }
@@ -146,17 +175,19 @@ export default function AdminQuestionsPage() {
     }
 
     try {
-      const response = await fetch(`/api/questions/${id}`, {
+      const response = await fetch(`/api/questions?id=${id}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete question');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete question');
       }
 
       await mutate();
     } catch (error) {
       console.error('Error deleting question:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete question');
     }
   };
 
@@ -198,8 +229,29 @@ export default function AdminQuestionsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-base font-semibold text-gray-900 mb-1">Questions Management</h1>
-          <p className="text-xs text-gray-500">Add, edit, and manage interview questions</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-base font-semibold text-gray-900 mb-1">Questions Management</h1>
+              <p className="text-xs text-gray-500">Add, edit, and manage interview questions</p>
+            </div>
+            <Button
+              onClick={() => {
+                setEditingQuestion(null);
+                setFormData({
+                  question: '',
+                  answer: '',
+                  categoryId: '',
+                  difficulty: 'Easy',
+                  tags: [],
+                });
+                setIsModalOpen(true);
+              }}
+              className="h-8"
+            >
+              <FiPlus className="w-4 h-4 mr-1" />
+              Add Question
+            </Button>
+          </div>
         </motion.div>
 
         {/* Search, Filter, and Page Size */}
@@ -388,17 +440,22 @@ export default function AdminQuestionsPage() {
               <h2 className="text-lg font-semibold mb-4">
                 {editingQuestion ? 'Edit Question' : 'Add New Question'}
               </h2>
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="question" className="block text-sm font-medium text-gray-700 mb-1">
                     Question
                   </label>
-                  <textarea
+                  <input
+                    type="text"
                     id="question"
                     value={formData.question}
                     onChange={(e) => setFormData({ ...formData, question: e.target.value })}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    rows={4}
                     required
                   />
                 </div>
@@ -406,13 +463,10 @@ export default function AdminQuestionsPage() {
                   <label htmlFor="answer" className="block text-sm font-medium text-gray-700 mb-1">
                     Answer
                   </label>
-                  <textarea
-                    id="answer"
+                  <RichTextEditor
                     value={formData.answer}
-                    onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    rows={6}
-                    required
+                    onChange={(value) => setFormData({ ...formData, answer: value })}
+                    placeholder="Enter your answer here..."
                   />
                 </div>
                 <div>
