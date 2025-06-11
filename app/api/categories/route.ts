@@ -14,8 +14,14 @@ export async function GET() {
       {
         $lookup: {
           from: 'questions',
-          localField: '_id',
-          foreignField: 'categoryId',
+          let: { categoryId: { $toString: '$_id' } },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$categoryId', '$$categoryId'] }
+              }
+            }
+          ],
           as: 'questions'
         }
       },
